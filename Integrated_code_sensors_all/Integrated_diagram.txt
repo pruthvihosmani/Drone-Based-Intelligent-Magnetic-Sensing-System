@@ -1,0 +1,10 @@
+[Arduino Mega]---[HC-SR04 Ultrasonic Sensor]
+       |                 TRIG Pin 9, ECHO Pin 10
+       |
+       +---[Inductive Proximity Sensor]--Digital Pin 2
+       |
+       +---[HMC5883L Magnetometer]
+       |                 SCL Pin 21, SDA Pin 20
+       |
+       +---[MPU6050 Accelerometer/Gyroscope]
+                     SCL Pin 21, SDA Pin 20, INT (Optional) to Digital Pin 3
