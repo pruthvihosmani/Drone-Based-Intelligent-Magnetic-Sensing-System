@@ -1,0 +1,9 @@
+Hall effect schematic diagram:
+[Arduino Mega]---[HW484 Hall Effect Sensor]
+       |                 | | | |
+       |                 | | | |
+       +--5V-----------VCC   |
+       |                     |
+       +--GND-----------GND  |
+       |                     |
+       +--Pin 2---------DO   |
