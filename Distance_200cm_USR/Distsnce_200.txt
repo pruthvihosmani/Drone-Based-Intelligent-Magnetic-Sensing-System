@@ -1,0 +1,16 @@
+The ultrasonic sensor is working perfectly, the code is is dumped in the mega board. need to work on the serial monitor.
+
+The connection is depicted below
+
+Arduino Mega                    HC-SR04 Ultrasonic Sensor
++----------------+              +------------------------+
+|                |              |                        |
+|             5V +--------------> VCC                    |
+|                |              |                        |
+|            GND +--------------> GND                    |
+|                |              |                        |
+|         Pin 9  +--------------> TRIG                   |
+|                |              |                        |
+|        Pin 10  +--------------> ECHO                   |
+|                |              |                        |
++----------------+              +------------------------+
