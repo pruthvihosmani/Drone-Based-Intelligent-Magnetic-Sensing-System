@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Function to generate dummy data
+    const refreshInterval = 5000; // Refresh interval in milliseconds (5 seconds)
+    
     function generateDummyData() {
       const data = [];
       for (let i = 0; i < 10; i++) {
@@ -22,23 +23,101 @@ document.addEventListener('DOMContentLoaded', function() {
       return data;
     }
   
-    // Generate dummy data
-    const dummyData = generateDummyData();
+    // Initialize charts
+    let accelerometerChart, metallicPresenceChart, magnetometerChart, uvSensorChart, batteryLevelChart;
+    
+    function initializeCharts() {
+      const dummyData = generateDummyData();
   
-    // Extract data for charts
-    const timestamps = dummyData.map(item => item.timestamp);
-    const accelX = dummyData.map(item => item.accel_x);
-    const accelY = dummyData.map(item => item.accel_y);
-    const accelZ = dummyData.map(item => item.accel_z);
-    const metallicPresence = dummyData.map(item => item.metallic_presence);
-    const magnetometer = dummyData.map(item => item.magnetometer);
-    const uvDistance = dummyData.map(item => item.uv_distance);
-    const batteryLevel = dummyData.map(item => item.battery_level);
-    const sensorStatus = JSON.parse(dummyData[dummyData.length - 1].sensor_status);
+      const timestamps = dummyData.map(item => item.timestamp);
+      const accelX = dummyData.map(item => item.accel_x);
+      const accelY = dummyData.map(item => item.accel_y);
+      const accelZ = dummyData.map(item => item.accel_z);
+      const metallicPresence = dummyData.map(item => item.metallic_presence);
+      const magnetometer = dummyData.map(item => item.magnetometer);
+      const uvDistance = dummyData.map(item => item.uv_distance);
+      const batteryLevel = dummyData.map(item => item.battery_level);
+      const sensorStatus = JSON.parse(dummyData[dummyData.length - 1].sensor_status);
   
-    // Function to create line chart
+      accelerometerChart = createLineChart('accelerometerChart', 'Accelerometer Data', timestamps, [
+        { label: 'X', data: accelX, borderColor: 'red', fill: false },
+        { label: 'Y', data: accelY, borderColor: 'green', fill: false },
+        { label: 'Z', data: accelZ, borderColor: 'blue', fill: false }
+      ]);
+  
+      metallicPresenceChart = createBarChart('metallicPresenceChart', 'Metallic Presence', timestamps, metallicPresence, 'purple');
+  
+      magnetometerChart = createLineChart('magnetometerChart', 'Magnetometer Data', timestamps, [
+        { label: 'Magnetometer', data: magnetometer, borderColor: 'orange', fill: false }
+      ]);
+  
+      uvSensorChart = createLineChart('uvSensorChart', 'UV Sensor Data', timestamps, [
+        { label: 'UV Distance', data: uvDistance, borderColor: 'violet', fill: false }
+      ]);
+  
+      batteryLevelChart = createLineChart('batteryLevelChart', 'Battery Level', timestamps, [
+        { label: 'Battery Level', data: batteryLevel, borderColor: 'green', fill: false }
+      ]);
+  
+      // Display sensor status list
+      const sensorStatusList = document.getElementById('sensorStatusList');
+      sensorStatusList.innerHTML = '';
+      sensorStatus.forEach(status => {
+        const li = document.createElement('li');
+        li.textContent = `${status.sensor}: ${status.status}`;
+        sensorStatusList.appendChild(li);
+      });
+  
+      // Display alert if UV distance exceeds 2 meters
+      const uvAlert = document.getElementById('uvAlert');
+      if (uvDistance.some(distance => distance > 2)) {
+        uvAlert.style.display = 'block';
+        uvAlert.textContent = `Alert: Height exceeds 2 meters! Current height: ${Math.max(...uvDistance).toFixed(2)} meters.`;
+      } else {
+        uvAlert.style.display = 'none';
+      }
+    }
+  
+    function refreshCharts() {
+      const dummyData = generateDummyData();
+  
+      const timestamps = dummyData.map(item => item.timestamp);
+      const accelX = dummyData.map(item => item.accel_x);
+      const accelY = dummyData.map(item => item.accel_y);
+      const accelZ = dummyData.map(item => item.accel_z);
+      const metallicPresence = dummyData.map(item => item.metallic_presence);
+      const magnetometer = dummyData.map(item => item.magnetometer);
+      const uvDistance = dummyData.map(item => item.uv_distance);
+      const batteryLevel = dummyData.map(item => item.battery_level);
+      const sensorStatus = JSON.parse(dummyData[dummyData.length - 1].sensor_status);
+  
+      updateChart(accelerometerChart, timestamps, [accelX, accelY, accelZ]);
+      updateChart(metallicPresenceChart, timestamps, [metallicPresence]);
+      updateChart(magnetometerChart, timestamps, [magnetometer]);
+      updateChart(uvSensorChart, timestamps, [uvDistance]);
+      updateChart(batteryLevelChart, timestamps, [batteryLevel]);
+  
+      // Update sensor status list
+      const sensorStatusList = document.getElementById('sensorStatusList');
+      sensorStatusList.innerHTML = '';
+      sensorStatus.forEach(status => {
+        const li = document.createElement('li');
+        li.textContent = `${status.sensor}: ${status.status}`;
+        sensorStatusList.appendChild(li);
+      });
+  
+      // Update alert if UV distance exceeds 2 meters
+      const uvAlert = document.getElementById('uvAlert');
+      if (uvDistance.some(distance => distance > 2)) {
+        uvAlert.style.display = 'block';
+        uvAlert.textContent = `Alert: Height exceeds 2 meters! Current height: ${Math.max(...uvDistance).toFixed(2)} meters.`;
+      } else {
+        uvAlert.style.display = 'none';
+      }
+    }
+  
     function createLineChart(id, title, labels, datasets) {
-      new Chart(document.getElementById(id), {
+      return new Chart(document.getElementById(id), {
         type: 'line',
         data: {
           labels: labels,
@@ -46,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: {
             x: {
               type: 'time',
@@ -74,9 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   
-    // Function to create bar chart
     function createBarChart(id, title, labels, data, backgroundColor) {
-      new Chart(document.getElementById(id), {
+      return new Chart(document.getElementById(id), {
         type: 'bar',
         data: {
           labels: labels,
@@ -88,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: {
             x: {
               type: 'time',
@@ -116,38 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   
-    // Create charts with dummy data
-    createLineChart('accelerometerChart', 'Accelerometer Data', timestamps, [
-      { label: 'X', data: accelX, borderColor: 'red', fill: false },
-      { label: 'Y', data: accelY, borderColor: 'green', fill: false },
-      { label: 'Z', data: accelZ, borderColor: 'blue', fill: false }
-    ]);
-  
-    createBarChart('metallicPresenceChart', 'Metallic Presence', timestamps, metallicPresence, 'purple');
-  
-    createLineChart('magnetometerChart', 'Magnetometer Data', timestamps, [
-      { label: 'Magnetometer', data: magnetometer, borderColor: 'orange', fill: false }
-    ]);
-  
-    createLineChart('uvSensorChart', 'UV Sensor Data', timestamps, [
-      { label: 'UV Distance', data: uvDistance, borderColor: 'violet', fill: false }
-    ]);
-  
-    // Display alert if UV distance exceeds 2 meters
-    if (uvDistance.some(distance => distance > 2)) {
-      document.getElementById('uvAlert').style.display = 'block';
+    function updateChart(chart, labels, dataArrays) {
+      chart.data.labels = labels;
+      chart.data.datasets.forEach((dataset, index) => {
+        dataset.data = dataArrays[index];
+      });
+      chart.update();
     }
   
-    createLineChart('batteryLevelChart', 'Battery Level', timestamps, [
-      { label: 'Battery Level', data: batteryLevel, borderColor: 'green', fill: false }
-    ]);
-  
-    // Display sensor status list
-    const sensorStatusList = document.getElementById('sensorStatusList');
-    sensorStatus.forEach(status => {
-      const li = document.createElement('li');
-      li.textContent = `${status.sensor}: ${status.status}`;
-      sensorStatusList.appendChild(li);
-    });
+    initializeCharts();
+    setInterval(refreshCharts, refreshInterval);
   });
   
