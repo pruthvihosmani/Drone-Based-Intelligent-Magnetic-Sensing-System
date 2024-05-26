@@ -85,19 +85,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function addMissingDataPoint(timestamp) {
-    const darkLineColor = 'rgba(0, 0, 0, 0.1)';
-    addDataToChart(accelerometerChart, timestamp, [null, null, null], darkLineColor);
-    addDataToChart(metallicPresenceChart, timestamp, [null], darkLineColor);
-    addDataToChart(magnetometerChart, timestamp, [null, null, null], darkLineColor);
-    addDataToChart(uvSensorChart, timestamp, [null], darkLineColor);
+    addDataToChart(accelerometerChart, timestamp, [null, null, null]);
+    addDataToChart(metallicPresenceChart, timestamp, [null]);
+    addDataToChart(magnetometerChart, timestamp, [null, null, null]);
+    addDataToChart(uvSensorChart, timestamp, [null]);
   }
 
-  function addDataToChart(chart, timestamp, dataArray, lineColor = null) {
+  function addDataToChart(chart, timestamp, dataArray) {
     chart.data.labels.push(timestamp);
     chart.data.datasets.forEach((dataset, index) => {
-      dataset.data.push(dataArray[index]);
-      if (lineColor) {
-        dataset.borderColor = lineColor;
+      if (dataArray[index] === null) {
+        dataset.data.push({ x: timestamp, y: dataArray[index], borderColor: 'rgba(0, 0, 0, 0.1)' });
+      } else {
+        dataset.data.push({ x: timestamp, y: dataArray[index] });
       }
     });
     chart.update();
