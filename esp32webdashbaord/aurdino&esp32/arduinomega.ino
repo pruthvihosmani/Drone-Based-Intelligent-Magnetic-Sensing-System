@@ -7,18 +7,24 @@
 MPU6050 mpu;
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
-// Ultrasonic Sensor Pins
+// Pin definitions
+#define MPU_SDA_PIN 20 // Change if necessary
+#define MPU_SCL_PIN 21 // Change if necessary
+
+#define HMC5883L_SDA_PIN 20 // Change if necessary
+#define HMC5883L_SCL_PIN 21 // Change if necessary
+
 #define TRIG_PIN 9
 #define ECHO_PIN 10
-#define MAX_DISTANCE 200
-
-// Inductive Sensor Pin
 #define IND_SENSOR_PIN 2
 
 void setup() {
+  // Initialize serial communication
   Serial.begin(9600);
   Serial1.begin(115200); // Communication with the ESP32
-  Wire.begin();
+
+  // Initialize I2C communication for MPU6050 and HMC5883L
+  Wire.begin(MPU_SDA_PIN, MPU_SCL_PIN);
 
   // MPU6050 Setup
   mpu.initialize();
@@ -91,7 +97,7 @@ void loop() {
   // Send JSON string to ESP32 via Serial1
   Serial1.println(jsonString);
 
-  // Also print to Serial Monitor for debuggingh
+  // Also print to Serial Monitor for debugging
   Serial.println(jsonString);
 
   delay(1000); // Delay between readings
