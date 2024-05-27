@@ -50,13 +50,23 @@ void loop() {
   // Read MPU6050
   int16_t ax, ay, az, gx, gy, gz;
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  jsonDoc["accelerometer"] = {{"ax", ax}, {"ay", ay}, {"az", az}};
-  jsonDoc["gyroscope"] = {{"gx", gx}, {"gy", gy}, {"gz", gz}};
+  JsonObject accelerometer = jsonDoc.createNestedObject("accelerometer");
+  accelerometer["ax"] = ax;
+  accelerometer["ay"] = ay;
+  accelerometer["az"] = az;
+
+  JsonObject gyroscope = jsonDoc.createNestedObject("gyroscope");
+  gyroscope["gx"] = gx;
+  gyroscope["gy"] = gy;
+  gyroscope["gz"] = gz;
 
   // Read HMC5883L
   sensors_event_t event;
   mag.getEvent(&event);
-  jsonDoc["magnetometer"] = {{"mx", event.magnetic.x}, {"my", event.magnetic.y}, {"mz", event.magnetic.z}};
+  JsonObject magnetometer = jsonDoc.createNestedObject("magnetometer");
+  magnetometer["mx"] = event.magnetic.x;
+  magnetometer["my"] = event.magnetic.y;
+  magnetometer["mz"] = event.magnetic.z;
 
   // Read Ultrasonic Sensor
   long duration, distance;
@@ -67,7 +77,8 @@ void loop() {
   digitalWrite(TRIG_PIN, LOW);
   duration = pulseIn(ECHO_PIN, HIGH);
   distance = (duration / 2) / 29.1;
-  jsonDoc["ultrasonic"] = {{"distance", distance}};
+  JsonObject ultrasonic = jsonDoc.createNestedObject("ultrasonic");
+  ultrasonic["distance"] = distance;
 
   // Read Inductive Proximity Sensor
   int metalDetected = digitalRead(IND_SENSOR_PIN);
@@ -77,11 +88,10 @@ void loop() {
   String jsonString;
   serializeJson(jsonDoc, jsonString);
 
-  // Send JSON string to ESP32
+  // Send JSON string to ESP32 via Serial1
   Serial1.println(jsonString);
 
-  // Print the JSON string to Serial Monitor
-  Serial.println("Data sent to ESP32: ");
+  // Also print to Serial Monitor for debuggingh
   Serial.println(jsonString);
 
   delay(1000); // Delay between readings
